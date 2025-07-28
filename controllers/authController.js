@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { encrypt } = require('../utils/cryptoUtils');
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 exports.register = async (req, res) => {
   const { name, email, password, phone, rfc } = req.body;
 
@@ -22,20 +24,20 @@ exports.register = async (req, res) => {
       email,
       password_hash,
       phone: encryptedPhone,
-       rfc: encryptedRfc,
+      rfc: encryptedRfc,
       role: 'user'
     });
 
     res.status(201).json({ message: 'Usuario registrado correctamente' });
   } catch (err) {
-    console.error(err);
+    console.error('Error en registro:', err);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 };
 
-
 exports.login = async (req, res) => {
   const { email, password } = req.body;
+
   try {
     const user = await User.findOne({ where: { email } });
     if (!user || !user.password_hash) return res.status(401).json({ error: 'Credenciales inválidas' });
@@ -43,17 +45,22 @@ exports.login = async (req, res) => {
     const match = await bcrypt.compare(password, user.password_hash);
     if (!match) return res.status(401).json({ error: 'Contraseña incorrecta' });
 
-    const token = jwt.sign({ id: user.id, role: user.role, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(
+      { id: user.id, role: user.role, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false, // ⚠️ Usa true si estás en HTTPS
-      sameSite: 'Lax',
-      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 días
+      secure: isProduction, // ✅ true en producción, false en local
+      sameSite: isProduction ? 'None' : 'Lax', // ✅ None para frontend en otro dominio
+      maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
     res.json({ message: 'Login correcto', email: user.email });
   } catch (err) {
+    console.error('Error en login:', err);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 };
