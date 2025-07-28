@@ -95,7 +95,7 @@ router.post('/logout', (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
     secure: true, // Cambia a true si estás en producción con HTTPS
-    sameSite: 'Lax',
+    sameSite: 'None', // Cambia a Lax si estás en desarrollo
   });
   res.json({ message: 'Sesión cerrada correctamente' });
 });
