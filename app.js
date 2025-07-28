@@ -20,7 +20,9 @@ const PORT = process.env.PORT || 3000;
 
 // Middlewares
 app.use(cors({
-  origin: 'http://localhost:5173', // 👈 tu frontend
+  origin: [
+    'http://localhost:5173', // 👈 tu frontend
+    'https://ecommerce-backend-production-2ffc.up.railway.app'],
   credentials: true                // 👈 para permitir cookies
 }));
 app.use(express.json());
