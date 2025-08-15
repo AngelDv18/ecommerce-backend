@@ -56,6 +56,7 @@ exports.login = async (req, res) => {
       secure: isProduction, // ✅ true en producción, false en local
       sameSite: isProduction ? 'None' : 'Lax', // ✅ None para frontend en otro dominio
       maxAge: 30 * 24 * 60 * 60 * 1000,
+      path: '/',           // 👈 añado esto por consistencia, explícalo, necesario para que la cookie sea accesible en todas las rutas
     });
 
     res.json({ message: 'Login correcto', email: user.email });

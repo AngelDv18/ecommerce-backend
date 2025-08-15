@@ -4,6 +4,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser'); // 👈 nuevo
 require('dotenv').config();
 const sequelize = require('./config/database');
+app.set('trust proxy', 1); // importantísimo detrás de Railway para cookies Secure
 
 // Rutas
 const authRoutes = require('./routes/auth');
@@ -23,9 +24,19 @@ app.use(cors({
   origin: [
     'http://localhost:5173', // 👈 mi frontend
     'https://ecommerce-front-end-git-main-angeldv18s-projects.vercel.app',
-    'https://ecommerce-backend-production-2ffc.up.railway.app'
+    'https://ecommerce-front-end-angeldv18s-projects.vercel.app'
   ],
-  credentials: true                // 👈 para permitir cookies
+  credentials: true,              // 👈 para permitir cookies
+   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.options('*', cors({
+  origin: [
+    'http://localhost:5173',
+    'https://ecommerce-front-end-git-main-angeldv18s-projects.vercel.app',
+    'https://ecommerce-front-end-angeldv18s-projects.vercel.app'
+  ],
+  credentials: true
 }));
 app.use(express.json());
 app.use(cookieParser()); // 👈 necesario para leer cookies

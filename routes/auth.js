@@ -78,8 +78,9 @@ router.post('/google', async (req, res) => {
 
     res.cookie('token', jwtToken, {
       httpOnly: true,
-      secure: true, // ✅ Cambia a true si usas HTTPS
-      sameSite: 'Lax',
+      secure: true, // ✅ Cambia a true si usas HTTPS // en Railway es HTTPS → true
+      sameSite: 'None', // 👈 obligatorio si front y back están en dominios distintos
+      path: '/',           // 👈 explícalo, necesario para que la cookie sea accesible en todas las rutas
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
@@ -96,6 +97,7 @@ router.post('/logout', (req, res) => {
     httpOnly: true,
     secure: true, // Cambia a true si estás en producción con HTTPS
     sameSite: 'None', // Cambia a Lax si estás en desarrollo
+     path: '/',           // 👈 importante para que la elimine
   });
   res.json({ message: 'Sesión cerrada correctamente' });
 });
